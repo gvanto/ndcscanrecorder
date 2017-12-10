@@ -62,6 +62,8 @@ public class NdcScanApp {
 	
 	public void run() throws InterruptedException
 	{
+		echo("Starting: " + this.getClass().toString());
+		
 		if(!loadConfig()) {
 			System.err.println("Error loading config. Aborting...");
 			System.exit(0);
@@ -79,10 +81,10 @@ public class NdcScanApp {
         } catch (UnknownHostException e) {
         	//todo
             System.err.println("Unknown host: " + host);
-            System.exit(0);
+            NdcScanRecorder.closeApplicationNicelyAndRestart(10);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to: " + host + ":" + port);
-            System.exit(0);
+            NdcScanRecorder.closeApplicationNicelyAndRestart(10);
         }
         
         
@@ -199,7 +201,7 @@ public class NdcScanApp {
 	    			echo("WARNING: cycleSeconds did not calculate properly. Resetting to 1740 secs (= 29 min)");
 	    			cycleSeconds = 1740;
         		}
-	    		cycleMin = (cycleSeconds - (cycleSeconds%60)) / 60;
+	    		cycleMin = NdcTime.secondsToMinutes(cycleSeconds);
 	    		
 	    		// If for some reason cycleSeconds > 29minutes, we cap it at 29min
 	    		if (cycleSeconds > 1740) {
@@ -270,6 +272,24 @@ public class NdcScanApp {
 			ex.printStackTrace();
 			return false;
 		}
+	}
+	
+	public void closeIoConnections()
+	{
+		echo(this.getClass().toString() + ": Closing IO connections");
+		try {
+			if (this.socket != null) {
+				this.socket.close();
+			}
+			if (this.printWriter != null) {
+				this.printWriter.close();
+			}
+			if (this.bufferedReader != null) {
+				this.bufferedReader.close();
+			}
+		} catch (IOException e) {
+	        System.err.println("Error (while attempting to close socket / printwriter / br): " + e.getMessage());	        
+	    }
 	}
 	
 	public static void echo(String s)

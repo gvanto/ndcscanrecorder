@@ -73,7 +73,7 @@ public class AppInitIO extends NdcDataIO
 						echo("Init completed: " + line);
 					} else {
 						echo("Error: Initialization failed. Aborting ...");
-						NdcScanRecorder.closeApplicationNicely();
+						NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 					}
 	    			
 	    		} // end if (br.ready()) 
@@ -82,13 +82,13 @@ public class AppInitIO extends NdcDataIO
 			
 		} catch (UnknownHostException e) {
 	        System.err.println("Unknown host: " + host);
-	        System.exit(0);
+	        NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 	    } catch (IOException e) {
 	        System.err.println("Couldn't get I/O for the connection to: " + host + ":" + port);
-	        System.exit(0);
+	        NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 	    } catch (InterruptedException e) {
 			e.printStackTrace();
-			System.exit(0);
+			NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 		}
 		
 		return isInitComplete;

@@ -3,6 +3,7 @@ package ndc.scanner.io;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 
+import com.plaslantic.common.NdcScanRecorder;
 import com.plaslantic.common.NdcUtils;
 
 /**
@@ -13,9 +14,11 @@ public abstract class NdcDataIO
 {
 	protected String command;
 	protected String description = "";
+	protected int waitForResponseTries = 0;
 	
-	PrintWriter printWriter; 
-	BufferedReader bufferedReader;
+	protected PrintWriter printWriter; 
+	protected BufferedReader bufferedReader;
+	
 	
 	public NdcDataIO(PrintWriter printWriter, BufferedReader bufferedReader)
 	{
@@ -41,11 +44,20 @@ public abstract class NdcDataIO
 				
 	    		while (!this.bufferedReader.ready()) {
 	    			echo("Waiting for reponse ...");
+	    			this.waitForResponseTries++;
+	    			
+	    			if (this.waitForResponseTries >= 20) {
+	    				echo("More than 20 'wait for response' tries, waiting 20min then restarting ...");
+	    				NdcScanRecorder.closeApplicationNicelyAndRestart(20 * 60); // 45 * 60
+	    			}
+	    			
 	    			Thread.sleep(1000);
 	    		}
 	    		
 	    		// Once ready, we are at start of a line of input
 	    		if (bufferedReader.ready()) {
+	    			this.waitForResponseTries = 0;
+	    			
 	    			line = ""; //clear line 
 	    			
 	    			while (bufferedReader.ready()) {
@@ -62,7 +74,7 @@ public abstract class NdcDataIO
 		
 	    } catch (Exception e) {
 			e.printStackTrace();
-			System.exit(0);
+			NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 		}
 		
 		return line;

@@ -35,6 +35,11 @@ public class NdcTime {
 		return (this.hour * 3600) + (this.min * 60) + this.sec;
 	}
 	
+	public static int secondsToMinutes(int seconds)
+	{
+		return (seconds - (seconds%60)) / 60;
+	}
+	
 	public String toString()
 	{
 		return NdcUtils.prettifyNumber(this.hour) + ":" 

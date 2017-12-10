@@ -75,7 +75,7 @@ public class NdcScanFileWriter {
 			} catch (IOException e) {				
 				e.printStackTrace();
 				echo("Error trying to create file: " + filePath);
-				NdcScanRecorder.closeApplicationNicely();				
+				NdcScanRecorder.closeApplicationNicelyAndRestart(10);				
 			}
 		}
 		
@@ -91,7 +91,7 @@ public class NdcScanFileWriter {
 		} catch (IOException e) {
 			echo("getCsvBufferedWriter: bufferedWriter opening error.");
 			e.printStackTrace();
-			NdcScanRecorder.closeApplicationNicely();
+			NdcScanRecorder.closeApplicationNicelyAndRestart(10);
 		}
 			
 		return bw;			

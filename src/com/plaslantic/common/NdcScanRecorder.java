@@ -25,22 +25,22 @@ public class NdcScanRecorder {
 			app.run();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			closeApplicationNicelyAndRestart(5);
 		}
 	}
 	
-	public static void closeApplicationNicely()
+	public static void closeApplicationNicelyAndRestart(int waitSeconds)
 	{
-		echo ("closeApplicationNicely: Closing ");
-			
-		try {
-    		app.getSocket().close();
-    		app.getPrintWriter().close();
-    		app.getBufferedReader().close();		
-		} catch (IOException e) {
-	        System.err.println("Error (while attempting to close socket / printwriter / br): " + e.getMessage());	        
-	    }
+		echo ("closeApplicationNicelyAndRestart()");
+		app.closeIoConnections();
 		
-		echo("waiting ... todo: restart");	
+		echo("Restarting in " + waitSeconds +  " seconds ... (= " + NdcTime.secondsToMinutes(waitSeconds) + " min)");
+		try {
+			Thread.sleep(waitSeconds * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		startApp();
 	}
 	
 	public static void echo(String s)
